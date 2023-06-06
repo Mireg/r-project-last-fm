@@ -1,0 +1,58 @@
+---
+title: "Working with API"
+output: html_notebook
+---
+
+# Packages needed for working with API
+
+```{r}
+#install.packages(c("httr", "jsonlite"))
+
+library(httr)
+library(jsonlite)
+```
+
+# To fetch the data from API we need to build an API URL.
+
+THE API KEY IS A SECRET. IT CANNOT BE USED ANYWHERE IN CODE DIRECTLY. 
+Instead create a .Renviron file in your local repository with environmental variable API_KEY that you will reference in code. 
+
+```
+API_KEY=<your_api_key_value>
+```
+After you do this, save the changes to the .Renviron file and use CTRL+SHIFT+F10 to restart R session.
+
+```{r}
+# Set the base URL for the Last.fm API
+base_url <- "http://ws.audioscrobbler.com/2.0/"
+
+# Define the API method you want to use
+api_method <- "method=artist.getTopTracks"
+
+# API key referenced from enviromental variables
+api_key <- Sys.getenv("API_KEY")
+
+# Define the artist you want to get top tracks for
+artist <- "Coldplay"
+
+# Build the URL for the API request
+api_url <- paste0(base_url, "?", api_method, "&artist=", URLencode(artist), "&api_key=", api_key, "&format=json")
+
+# Send the API request
+response <- GET(api_url)
+
+# Check the status code of the response
+status_code <- response$status_code
+
+# Get the JSON content from the response
+content <- content(response, "text", encoding = "UTF-8")
+
+# Print JSON
+#cat(content)
+
+#transform it to Dataframe
+
+df <- fromJSON(content)
+df
+```
+
